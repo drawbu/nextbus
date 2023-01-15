@@ -4,67 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"main/types"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 )
-
-type Line struct {
-	Id     string      `json:"id"`
-	Name   string      `json:"name"`
-	Code   string      `json:"code"`
-	Type   string      `json:"type"`
-	Routes []LineRoute `json:"routes"`
-}
-
-type LineRoute struct {
-	Id         string     `json:"id"`
-	Name       string     `json:"name"`
-	Start      string     `json:"start"`
-	End        string     `json:"end"`
-	StopPoints []LineStop `json:"stopPoints"`
-}
-
-type LineStop struct {
-	Id                    string `json:"id"`
-	Name                  string `json:"name"`
-	FullLabel             string `json:"fullLabel"`
-	Latitude              string `json:"latitude"`
-	Longitude             string `json:"longitude"`
-	ExternalCode          string `json:"externalCode"`
-	City                  string `json:"city"`
-	HasWheelchairBoarding bool   `json:"hasWheelchairBoarding"`
-	StopAreaId            string `json:"stopAreaId"`
-	PartialStop           bool   `json:"partialStop"`
-}
-
-type RealtimeStop struct {
-	VehicleLattitude         float64 `json:"vehicle_lattitude"`
-	VehicleLongitude         float64 `json:"vehicle_longitude"`
-	WaitTimeText             string  `json:"waittime_text"`
-	TripId                   string  `json:"trip_id"`
-	ScheduleId               string  `json:"schedule_id"`
-	DestinationId            string  `json:"destination_id"`
-	DestinationName          string  `json:"destination_name"`
-	Departure                string  `json:"departure"`
-	DepartureCommande        string  `json:"departure_commande"`
-	DepartureTheorique       string  `json:"departure_theorique"`
-	Arrival                  string  `json:"arrival"`
-	ArrivalCommande          string  `json:"arrival_commande"`
-	ArrivalTheorique         string  `json:"arrival_theorique"`
-	Comment                  string  `json:"comment"`
-	Realtime                 string  `json:"realtime"`
-	WaitTime                 string  `json:"waittime"`
-	UpdatedAt                string  `json:"updated_at"`
-	VehicleId                string  `json:"vehicle_id"`
-	VehiclePositionUpdatedAt string  `json:"vehicle_position_updated_at"`
-	Origin                   string  `json:"origin"`
-}
-
-type RealtimePass struct {
-	Destinations map[string][]RealtimeStop `json:"destinations"`
-}
 
 func getRequest(url string, response any) (err error) {
 	resp, err := http.Get(url)
@@ -92,7 +37,7 @@ line       : line number
 stop       : stop name`)
 }
 
-func getStop(line []LineStop, stopName string) (err error, stop LineStop) {
+func getStop(line []types.LineStop, stopName string) (err error, stop types.LineStop) {
 	for _, s := range line {
 		if strings.Contains(strings.ToLower(s.Name), strings.ToLower(stopName)) {
 			stop = s
@@ -121,7 +66,7 @@ func main() {
 
 	switch strings.ToLower(args[0]) {
 	case "bus":
-		var line Line
+		var line types.Line
 		err := getRequest(fmt.Sprintf("%v/network/line-informations/%v", baseUrl, args[1]), &line)
 		if err != nil {
 			panic(err)
@@ -143,7 +88,7 @@ func main() {
 
 			// Try to get realtime data, if it doesn't work, trying to get the
 			// opposite direction, if it doesn't work, stop here
-			var realtimePass RealtimePass
+			var realtimePass types.RealtimePass
 			stopId, err := strconv.Atoi(strings.Split(stop.Id, ":")[3])
 			url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", baseUrl, stopId, args[1], args[1])
 			err = getRequest(url, &realtimePass)
