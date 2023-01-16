@@ -7,7 +7,6 @@ import (
 	"main/types"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -50,6 +49,19 @@ func getStop(line []types.LineStop, stopName string) (err error, stop types.Line
 	return
 }
 
+func getRealTimeDataBuses(busName string, stop types.LineStop) (err error, realtimePass types.RealtimePass) {
+	stopId := strings.Split(stop.Id, ":")[3]
+	url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", BaseUrl, stopId, busName, busName)
+	err = getRequest(url, &realtimePass)
+	if err != nil {
+		return
+	}
+
+	// If the request or parsing failed, try again with the opposite direction
+	err = getRequest(url+"_R", &realtimePass)
+	return
+}
+
 func main() {
 	args := os.Args[1:]
 	if len(args) == 0 || args[0] == "-h" || args[0] == "--help" {
@@ -82,25 +94,16 @@ func main() {
 				continue
 			}
 
-			// Find direction
-			direction := route.StopPoints[len(route.StopPoints)-1]
-			fmt.Printf("Bus %v, %v, direction %v\n", args[1], stop.Name, direction.Name)
-
-			// Try to get realtime data, if it doesn't work try to get the
-			// opposite direction, if it doesn't work stop here
-			var realtimePass types.RealtimePass
-			stopId, err := strconv.Atoi(strings.Split(stop.Id, ":")[3])
-			url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", BaseUrl, stopId, args[1], args[1])
-			err = getRequest(url, &realtimePass)
+			// Try to get realtime data, if it doesn't work stop here
+			err, realTimeDataBuses := getRealTimeDataBuses(args[1], stop)
 			if err != nil {
-				err = getRequest(url+"_R", &realtimePass)
-				if err != nil {
-					panic(err)
-				}
+				panic(err)
 			}
 
-			// Print the next buses
-			for _, e := range realtimePass.Destinations[strings.Split(direction.Id, ":")[3]] {
+			// Print the results
+			direction := route.StopPoints[len(route.StopPoints)-1]
+			fmt.Printf("Bus %v, %v, direction %v\n", args[1], stop.Name, direction.Name)
+			for _, e := range realTimeDataBuses.Destinations[strings.Split(direction.Id, ":")[3]] {
 				fmt.Printf("- %v\n", e.WaitTimeText)
 			}
 		}
