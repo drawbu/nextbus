@@ -72,11 +72,10 @@ func main() {
 			panic(err)
 		}
 
-		// A stop can have multiple direction, so we print all of them
+		// A stop can have multiple direction, so we loop over all of them
 		for _, route := range line.Routes {
-			// Find the bus stop
+			// Find the bus stop, if the stop isn't found, stop here
 			err, stop := getStop(route.StopPoints, args[2])
-			// If stop not found, stop here
 			if stop.Name == "" {
 				fmt.Println("Stop not found")
 				continue
@@ -86,8 +85,8 @@ func main() {
 			direction := route.StopPoints[len(route.StopPoints)-1]
 			fmt.Printf("Bus %v, %v, direction %v\n", args[1], stop.Name, direction.Name)
 
-			// Try to get realtime data, if it doesn't work, trying to get the
-			// opposite direction, if it doesn't work, stop here
+			// Try to get realtime data, if it doesn't work try to get the
+			// opposite direction, if it doesn't work stop here
 			var realtimePass types.RealtimePass
 			stopId, err := strconv.Atoi(strings.Split(stop.Id, ":")[3])
 			url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", baseUrl, stopId, args[1], args[1])
