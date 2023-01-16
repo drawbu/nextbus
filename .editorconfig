@@ -1,0 +1,15 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+indent_size = 4
+indent_style = space
+insert_final_newline = false
+max_line_length = 80
+tab_width = 4
+ij_visual_guides = 80
+ij_wrap_on_typing = false
+
+[*.go]
+indent_style = tab
