@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+var BaseUrl = "https://ws.infotbm.com/ws/1.0"
+
 func getRequest(url string, response any) (err error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -62,12 +64,11 @@ func main() {
 		fmt.Println("Too many argument provided, please refer to the help: nextbus -h")
 		return
 	}
-	const baseUrl = "https://ws.infotbm.com/ws/1.0"
 
 	switch strings.ToLower(args[0]) {
 	case "bus":
 		var line types.Line
-		err := getRequest(fmt.Sprintf("%v/network/line-informations/%v", baseUrl, args[1]), &line)
+		err := getRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, args[1]), &line)
 		if err != nil {
 			panic(err)
 		}
@@ -89,7 +90,7 @@ func main() {
 			// opposite direction, if it doesn't work stop here
 			var realtimePass types.RealtimePass
 			stopId, err := strconv.Atoi(strings.Split(stop.Id, ":")[3])
-			url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", baseUrl, stopId, args[1], args[1])
+			url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", BaseUrl, stopId, args[1], args[1])
 			err = getRequest(url, &realtimePass)
 			if err != nil {
 				err = getRequest(url+"_R", &realtimePass)
