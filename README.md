@@ -23,7 +23,7 @@ Options and arguments (and corresponding environment variables):
              argument is provided)
 transport  : type of transport (bus, car, tram...)
 line       : line number
-stop       : stop name 
+stop       : stop name, optional, will print all stop in the line if missing
 ```
 
 ## Examples
@@ -38,4 +38,16 @@ Bus 10, Peixotto, direction Jardin Botanique Terminus
 - 9 minutes
 - 14 minutes
 - 24 minutes
+```
+
+
+```bash
+$ ./nextbus bus 10
+Bus Lianes 10
+
+GRADIGNAN  BEAUSOLEIL
+- Jardin Botanique Terminus
+- Stalingrad (Tram A)
+- Pôle emploi Bastide
+etc...
 ```
