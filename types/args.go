@@ -28,6 +28,9 @@ func (args *Args) GetArgs(cmdArgs []string) (err error) {
 
 	args.TransportType = strings.ToLower(cmdArgs[1])
 	args.Line = cmdArgs[2]
+	if len(args.Line) == 1 {
+		args.Line = "0" + args.Line
+	}
 	if len(cmdArgs) == 4 {
 		args.Stop = cmdArgs[3]
 	}
