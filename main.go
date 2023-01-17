@@ -28,14 +28,14 @@ func getRequest(url string, response any) (err error) {
 	return
 }
 
-func printHelp() {
-	fmt.Println(`Usage: nextbus [transport] [line] [stop]
+func getHelpMessage() string {
+	return `Usage: nextbus [transport] [line] [stop]
 Options and arguments (and corresponding environment variables):
 -h, --help : print help (this message) and exit (also print this message if no
              argument is provided)
 transport  : type of transport (bus, car, tram...)
 line       : line number
-stop       : stop name`)
+stop       : stop name`
 }
 
 func getStop(line []types.LineStop, stopName string) (err error, stop types.LineStop) {
@@ -74,7 +74,7 @@ func main() {
 		panic(err)
 	}
 	if args.Help {
-		printHelp()
+		fmt.Printf("%v", getHelpMessage())
 		return
 	}
 
