@@ -14,7 +14,7 @@ func (args *Args) GetArgs(cmdArgs []string) (err error) {
 		args.Help = true
 		return
 	}
-	if len(cmdArgs) < 4 {
+	if len(cmdArgs) < 3 {
 		err = errors.New("not enough argument provided, please refer to the help: nextbus -h")
 		return
 	}
@@ -25,6 +25,8 @@ func (args *Args) GetArgs(cmdArgs []string) (err error) {
 
 	args.TransportType = cmdArgs[1]
 	args.Line = cmdArgs[2]
-	args.Stop = cmdArgs[3]
+	if len(cmdArgs) == 4 {
+		args.Stop = cmdArgs[3]
+	}
 	return
 }
