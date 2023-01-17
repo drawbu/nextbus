@@ -67,6 +67,26 @@ func getRealTimeDataBuses(busName string, stop types.LineStop, directionId strin
 	return
 }
 
+func getRealtimeBusArrival(route types.LineRoute, stopName string, line string) (err error) {
+	err, stop := getStop(route.StopPoints, stopName)
+	if err != nil {
+		fmt.Println("stop not found")
+		err = nil
+		return
+	}
+
+	direction := route.StopPoints[len(route.StopPoints)-1]
+	err, realTimeDataBuses := getRealTimeDataBuses(line, stop, direction.Id)
+	if err != nil {
+		return
+	}
+	fmt.Printf("Bus %v, %v, direction %v\n", line, stop.Name, direction.Name)
+	for _, e := range realTimeDataBuses {
+		fmt.Printf("- %v\n", e.WaitTimeText)
+	}
+	return
+}
+
 func main() {
 	args := types.Args{}
 	err := args.GetArgs(os.Args)
@@ -87,20 +107,9 @@ func main() {
 		}
 
 		for _, route := range line.Routes {
-			err, stop := getStop(route.StopPoints, args.Stop)
-			if err != nil {
-				fmt.Println("Stop not found")
-				continue
-			}
-
-			direction := route.StopPoints[len(route.StopPoints)-1]
-			err, realTimeDataBuses := getRealTimeDataBuses(args.Line, stop, direction.Id)
+			err = getRealtimeBusArrival(route, args.Stop, args.Line)
 			if err != nil {
 				panic(err)
-			}
-			fmt.Printf("Bus %v, %v, direction %v\n", args.Line, stop.Name, direction.Name)
-			for _, e := range realTimeDataBuses {
-				fmt.Printf("- %v\n", e.WaitTimeText)
 			}
 		}
 		break
