@@ -53,7 +53,7 @@ func getRealTimeDataBuses(busName string, stop types.LineStop) (err error, realt
 	stopId := strings.Split(stop.Id, ":")[3]
 	url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", BaseUrl, stopId, busName, busName)
 	err = getRequest(url, &realtimePass)
-	if err != nil {
+	if err == nil {
 		return
 	}
 
