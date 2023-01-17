@@ -35,7 +35,7 @@ Options and arguments (and corresponding environment variables):
              argument is provided)
 transport  : type of transport (bus, car, tram...)
 line       : line number
-stop       : stop name`
+stop       : stop name, optional, will print all stop in the line if missing`
 }
 
 func getStop(line []types.LineStop, stopName string) (err error, stop types.LineStop) {
@@ -106,6 +106,19 @@ func main() {
 			panic(err)
 		}
 
+		// List all the stops
+		if args.Stop == "" {
+			fmt.Printf("Bus %v\n", line.Name)
+			for _, e := range line.Routes {
+				fmt.Printf("\n%v\n", strings.ToUpper(e.Name))
+				for _, s := range e.StopPoints {
+					fmt.Printf("- %v\n", s.Name)
+				}
+			}
+			return
+		}
+
+		// Get the arrival time for a specific stop
 		for _, route := range line.Routes {
 			err = getRealtimeBusArrival(route, args.Stop, args.Line)
 			if err != nil {
