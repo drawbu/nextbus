@@ -98,7 +98,7 @@ func main() {
 		return
 	}
 
-	switch strings.ToLower(args.TransportType) {
+	switch args.TransportType {
 	case "bus":
 		var line types.Line
 		err := getRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, args.Line), &line)

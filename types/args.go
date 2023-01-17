@@ -1,6 +1,9 @@
 package types
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type Args struct {
 	TransportType string
@@ -23,7 +26,7 @@ func (args *Args) GetArgs(cmdArgs []string) (err error) {
 		return
 	}
 
-	args.TransportType = cmdArgs[1]
+	args.TransportType = strings.ToLower(cmdArgs[1])
 	args.Line = cmdArgs[2]
 	if len(cmdArgs) == 4 {
 		args.Stop = cmdArgs[3]
