@@ -68,41 +68,37 @@ func getRealTimeDataBuses(busName string, stop types.LineStop, directionId strin
 }
 
 func main() {
-	args := os.Args[1:]
-	if len(args) == 0 || args[0] == "-h" || args[0] == "--help" {
+	args := types.Args{}
+	err := args.GetArgs(os.Args)
+	if err != nil {
+		panic(err)
+	}
+	if args.Help {
 		printHelp()
 		return
 	}
-	if len(args) < 3 {
-		fmt.Println("Not enough argument provided, please refer to the help: nextbus -h")
-		return
-	}
-	if len(args) > 3 {
-		fmt.Println("Too many argument provided, please refer to the help: nextbus -h")
-		return
-	}
 
-	switch strings.ToLower(args[0]) {
+	switch strings.ToLower(args.TransportType) {
 	case "bus":
 		var line types.Line
-		err := getRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, args[1]), &line)
+		err := getRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, args.Line), &line)
 		if err != nil {
 			panic(err)
 		}
 
 		for _, route := range line.Routes {
-			err, stop := getStop(route.StopPoints, args[2])
+			err, stop := getStop(route.StopPoints, args.Stop)
 			if err != nil {
 				fmt.Println("Stop not found")
 				continue
 			}
 
 			direction := route.StopPoints[len(route.StopPoints)-1]
-			err, realTimeDataBuses := getRealTimeDataBuses(args[1], stop, direction.Id)
+			err, realTimeDataBuses := getRealTimeDataBuses(args.Line, stop, direction.Id)
 			if err != nil {
 				panic(err)
 			}
-			fmt.Printf("Bus %v, %v, direction %v\n", args[1], stop.Name, direction.Name)
+			fmt.Printf("Bus %v, %v, direction %v\n", args.Line, stop.Name, direction.Name)
 			for _, e := range realTimeDataBuses {
 				fmt.Printf("- %v\n", e.WaitTimeText)
 			}
