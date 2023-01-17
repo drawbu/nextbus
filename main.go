@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var BaseUrl = "https://ws.infotbm.com/ws/1.0"
+const BaseUrl = "https://ws.infotbm.com/ws/1.0"
 
 func getRequest(url string, response any) (err error) {
 	resp, err := http.Get(url)
