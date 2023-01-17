@@ -92,7 +92,7 @@ func main() {
 
 		for _, route := range line.Routes {
 			err, stop := getStop(route.StopPoints, args[2])
-			if stop.Name == "" {
+			if err != nil {
 				fmt.Println("Stop not found")
 				continue
 			}
