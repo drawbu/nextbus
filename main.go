@@ -49,16 +49,21 @@ func getStop(line []types.LineStop, stopName string) (err error, stop types.Line
 	return
 }
 
-func getRealTimeDataBuses(busName string, stop types.LineStop) (err error, realtimePass types.RealtimePass) {
+func getRealTimeDataBuses(busName string, stop types.LineStop, directionId string) (err error, result []types.RealtimeStop) {
+	var realtimePass types.RealtimePass
 	stopId := strings.Split(stop.Id, ":")[3]
 	url := fmt.Sprintf("%v/get-realtime-pass/%v/%v/route:TBC:%v", BaseUrl, stopId, busName, busName)
 	err = getRequest(url, &realtimePass)
 	if err == nil {
+		result = realtimePass.Destinations[strings.Split(directionId, ":")[3]]
 		return
 	}
 
 	// If the request or parsing failed, try again with the opposite direction
 	err = getRequest(url+"_R", &realtimePass)
+	if err == nil {
+		result = realtimePass.Destinations[strings.Split(directionId, ":")[3]]
+	}
 	return
 }
 
@@ -85,25 +90,20 @@ func main() {
 			panic(err)
 		}
 
-		// A stop can have multiple direction, so we loop over all of them
 		for _, route := range line.Routes {
-			// Find the bus stop, if the stop isn't found, stop here
 			err, stop := getStop(route.StopPoints, args[2])
 			if stop.Name == "" {
 				fmt.Println("Stop not found")
 				continue
 			}
 
-			// Try to get realtime data, if it doesn't work stop here
-			err, realTimeDataBuses := getRealTimeDataBuses(args[1], stop)
+			direction := route.StopPoints[len(route.StopPoints)-1]
+			err, realTimeDataBuses := getRealTimeDataBuses(args[1], stop, direction.Id)
 			if err != nil {
 				panic(err)
 			}
-
-			// Print the results
-			direction := route.StopPoints[len(route.StopPoints)-1]
 			fmt.Printf("Bus %v, %v, direction %v\n", args[1], stop.Name, direction.Name)
-			for _, e := range realTimeDataBuses.Destinations[strings.Split(direction.Id, ":")[3]] {
+			for _, e := range realTimeDataBuses {
 				fmt.Printf("- %v\n", e.WaitTimeText)
 			}
 		}
