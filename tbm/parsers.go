@@ -100,3 +100,19 @@ func GetRealtimeBusArrival(stopName string, line string) (err error, result stri
 	}
 	return
 }
+
+func GetStopList(lineName string) (err error, result string) {
+	err, line := GetBusLine(lineName)
+	if err != nil {
+		return
+	}
+
+	result += fmt.Sprintf("Bus %v\n", line.Name)
+	for _, e := range line.Routes {
+		result += fmt.Sprintf("\n%v\n", strings.ToUpper(e.Name))
+		for _, s := range e.StopPoints {
+			result += fmt.Sprintf("- %v\n", s.Name)
+		}
+	}
+	return
+}
