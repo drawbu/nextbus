@@ -67,7 +67,7 @@ func getRealTimeDataBuses(busName string, stop types.LineStop, directionId strin
 	return
 }
 
-func getRealtimeBusArrival(route types.LineRoute, stopName string, line string) (err error) {
+func getRealtimeBusArrival(route types.LineRoute, stopName string, line string) (err error, result string) {
 	err, stop := getStop(route.StopPoints, stopName)
 	if err != nil {
 		fmt.Println("stop not found")
@@ -80,9 +80,9 @@ func getRealtimeBusArrival(route types.LineRoute, stopName string, line string) 
 	if err != nil {
 		return
 	}
-	fmt.Printf("Bus %v, %v, direction %v\n", line, stop.Name, direction.Name)
+	result += fmt.Sprintf("Bus %v, %v, direction %v\n", line, stop.Name, direction.Name)
 	for _, e := range realTimeDataBuses {
-		fmt.Printf("- %v\n", e.WaitTimeText)
+		result += fmt.Sprintf("- %v\n", e.WaitTimeText)
 	}
 	return
 }
@@ -120,10 +120,11 @@ func main() {
 
 		// Get the arrival time for a specific stop
 		for _, route := range line.Routes {
-			err = getRealtimeBusArrival(route, args.Stop, args.Line)
+			err, result := getRealtimeBusArrival(route, args.Stop, args.Line)
 			if err != nil {
 				panic(err)
 			}
+			fmt.Printf("%v", result)
 		}
 		break
 	case "tram":
