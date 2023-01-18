@@ -66,22 +66,30 @@ func GetRealTimeDataBuses(busName string, stop types.LineStop, directionId strin
 	return
 }
 
-func GetRealtimeBusArrival(route types.LineRoute, stopName string, line string) (err error, result string) {
-	err, stop := getStop(route.StopPoints, stopName)
+func GetRealtimeBusArrival(stopName string, line string) (err error, result string) {
+	var route types.Line
+	err = GetRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, line), &route)
 	if err != nil {
-		fmt.Println("stop not found")
-		err = nil
-		return
+		panic(err)
 	}
+	for _, route := range route.Routes {
+		err, stop := getStop(route.StopPoints, stopName)
+		if err != nil {
+			fmt.Println("Stop not found")
+			err = nil
+			continue
+		}
 
-	direction := route.StopPoints[len(route.StopPoints)-1]
-	err, realTimeDataBuses := GetRealTimeDataBuses(line, stop, direction.Id)
-	if err != nil {
-		return
-	}
-	result += fmt.Sprintf("Bus %v, %v, direction %v\n", line, stop.Name, direction.Name)
-	for _, e := range realTimeDataBuses {
-		result += fmt.Sprintf("- %v\n", e.WaitTimeText)
+		direction := route.StopPoints[len(route.StopPoints)-1]
+		err, realTimeDataBuses := GetRealTimeDataBuses(line, stop, direction.Id)
+		if err != nil {
+			fmt.Println("No realtime data available")
+			continue
+		}
+		result += fmt.Sprintf("Bus %v, %v, direction %v\n", line, stop.Name, direction.Name)
+		for _, e := range realTimeDataBuses {
+			result += fmt.Sprintf("- %v\n", e.WaitTimeText)
+		}
 	}
 	return
 }

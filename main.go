@@ -40,13 +40,11 @@ func main() {
 		}
 
 		// Get the arrival time for a specific stop
-		for _, route := range line.Routes {
-			err, result := tbm.GetRealtimeBusArrival(route, args.Stop, args.Line)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Printf("%v", result)
+		err, result := tbm.GetRealtimeBusArrival(args.Stop, args.Line)
+		if err != nil {
+			panic(err)
 		}
+		fmt.Printf("%v", result)
 		break
 	case "tram":
 		fmt.Println("Not implemented yet")
