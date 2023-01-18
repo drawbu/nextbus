@@ -82,7 +82,7 @@ func GetRealtimeBusArrival(stopName string, line string) (err error, result stri
 	for _, route := range route.Routes {
 		err, stop := getStop(route.StopPoints, stopName)
 		if err != nil {
-			fmt.Println("Stop not found")
+			result += "Stop not found\n"
 			err = nil
 			continue
 		}
@@ -90,7 +90,7 @@ func GetRealtimeBusArrival(stopName string, line string) (err error, result stri
 		direction := route.StopPoints[len(route.StopPoints)-1]
 		err, realTimeDataBuses := GetRealTimeDataBuses(line, stop, direction.Id)
 		if err != nil {
-			fmt.Println("No realtime data available")
+			result += "No realtime data available\n"
 			continue
 		}
 		result += fmt.Sprintf("Bus %v, %v, direction %v\n", line, stop.Name, direction.Name)
