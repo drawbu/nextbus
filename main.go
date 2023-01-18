@@ -21,11 +21,7 @@ func main() {
 
 	switch args.TransportType {
 	case "bus":
-		var line types.Line
-		err := tbm.GetRequest(fmt.Sprintf("%v/network/line-informations/%v", tbm.BaseUrl, args.Line), &line)
-		if err != nil {
-			panic(err)
-		}
+		err, line := tbm.GetBusLine(args.Line)
 
 		// List all the stops
 		if args.Stop == "" {

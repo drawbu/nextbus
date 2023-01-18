@@ -66,11 +66,18 @@ func GetRealTimeDataBuses(busName string, stop types.LineStop, directionId strin
 	return
 }
 
-func GetRealtimeBusArrival(stopName string, line string) (err error, result string) {
-	var route types.Line
-	err = GetRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, line), &route)
+func GetBusLine(line string) (err error, result types.Line) {
+	err = GetRequest(fmt.Sprintf("%v/network/line-informations/%v", BaseUrl, line), &result)
 	if err != nil {
-		panic(err)
+		return
+	}
+	return
+}
+
+func GetRealtimeBusArrival(stopName string, line string) (err error, result string) {
+	err, route := GetBusLine(line)
+	if err != nil {
+		return
 	}
 	for _, route := range route.Routes {
 		err, stop := getStop(route.StopPoints, stopName)
