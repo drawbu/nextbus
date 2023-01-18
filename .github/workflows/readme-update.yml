@@ -1,0 +1,26 @@
+name: Updating README.md
+
+on:
+  workflow_dispatch:
+  push: { branches: [ "master", "main" ] }
+
+jobs:
+  reamde-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+            go-version-file: './go.mod'
+      - name: Set up git
+        run: |
+          git config --local user.email "69208565+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git pull
+      - name: Update README.md
+        run: |
+          go run ./scripts/readme-update.go
+          git commit -m ":memo: Updated Readme" -a || echo "No changes to commit"
+          git push || echo "No changes to push"
